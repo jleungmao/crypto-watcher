@@ -1,0 +1,15 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Backend for crypto-watcher",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "author": "Joey Leung",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
