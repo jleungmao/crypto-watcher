@@ -10,6 +10,9 @@
   "author": "Joey Leung",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1"
+    "axios": "^0.23.0",
+    "cheerio": "^1.0.0-rc.10",
+    "express": "^4.17.1",
+    "puppeteer": "^10.4.0"
   }
 }
