@@ -36,7 +36,7 @@ const getBlockchainDataFromUrl = async (url) => {
     const sellPrice = $('.sc-1ryi78w-0.meihw.sc-jSFkmK.lrNMr').text();
     console.log(sellPrice);
 
-    await page.screenshot({ path: 'image.png' });
+    // await page.screenshot({ path: 'image.png' });
     // console.log($.html());
     // fs.writeFile('data.html', $.html(), () => {
     // });
@@ -45,13 +45,18 @@ const getBlockchainDataFromUrl = async (url) => {
 };
 
 
-
-
 exports.getBitcoinData = async (req, res, next) => {
     let blockchainBtcData = await getBlockchainDataFromUrl('https://exchange.blockchain.com/trade/BTC-USD');
+    res.json({
+        blockchainBtcBuy: blockchainBtcData[0],
+        blockchainBtcSell: blockchainBtcData[1],
+    });
+};
+
+exports.getEthereumData = async (req, res, next) => {
     let blockchainEthData = await getBlockchainDataFromUrl('https://exchange.blockchain.com/trade/ETH-USD');
     res.json({
-        blockchainBtc: blockchainBtcData,
-        blockchainEth: blockchainEthData
+        blockchainEthBuy: blockchainEthData[0],
+        blockchainEthSell: blockchainEthData[1],
     });
 };
