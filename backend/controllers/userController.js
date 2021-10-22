@@ -47,16 +47,10 @@ const getBlockchainDataFromUrl = async (url) => {
 
 exports.getBitcoinData = async (req, res, next) => {
     let blockchainBtcData = await getBlockchainDataFromUrl('https://exchange.blockchain.com/trade/BTC-USD');
-    res.json({
-        blockchainBtcBuy: blockchainBtcData[0],
-        blockchainBtcSell: blockchainBtcData[1],
-    });
+    res.json(blockchainBtcData);
 };
 
 exports.getEthereumData = async (req, res, next) => {
     let blockchainEthData = await getBlockchainDataFromUrl('https://exchange.blockchain.com/trade/ETH-USD');
-    res.json({
-        blockchainEthBuy: blockchainEthData[0],
-        blockchainEthSell: blockchainEthData[1],
-    });
+    res.json(blockchainEthData);
 };
