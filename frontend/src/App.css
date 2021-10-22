@@ -1,0 +1,6 @@
+.app {
+    display: flex;
+    margin: auto;
+    margin-top: 5vh;
+    width: 70vw;
+}

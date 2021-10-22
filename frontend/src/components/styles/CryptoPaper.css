@@ -1,0 +1,23 @@
+.section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.contents {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-around;
+    /* background-color: black; */
+}
+
+.recommendations {
+    flex-grow: 1;
+}
+
+.site-info {
+    max-width: 40vh;
+    flex-grow: 3;
+    margin: 30px;
+}
