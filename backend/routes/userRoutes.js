@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.get('/', userController.getMain);
 
-router.get('/bitcoin-data', userController.getBitcoinData);
-router.get('/ethereum-data', userController.getEthereumData);
+router.get('/blockchain-data', userController.getBlockchainData);
+router.get('/bittrex-data', userController.getBittrexData);
 
 module.exports = router;
