@@ -1,14 +1,14 @@
 const cheerio = require('cheerio');
 const puppeteer = require('puppeteer');
 const bluebird = require('bluebird');
-const fs = require('fs');
+const { delay } = require('bluebird');
 
 exports.getMain = (req, res, next) => {
     res.status(200).json({ message: "Successfully reached main page" });
 };
 
 const withBrowser = async (callback) => {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({ headless: true, defaultViewport: { width: 1920, height: 1080 } });
     try {
         return await callback(browser);
     } finally {
@@ -18,7 +18,6 @@ const withBrowser = async (callback) => {
 
 const withPage = async (browser, callback) => {
     const page = await browser.newPage();
-    await page.setViewport({ width: 1000, height: 1000 });
     try {
         return await callback(page);
     } finally {
@@ -63,14 +62,59 @@ const getBlockchainDataFromUrls = async (urls) => {
 
 
 const getBittrexDataFromUrls = async (urls) => {
-    return '';
+    return await withBrowser(async (browser) => {
+        return bluebird.map(urls, async (url) => {
+            return withPage(browser, async (page) => {
+                await page.goto(url);
+
+                //wait for input to be available
+                await page.waitForXPath('/html/body/div[1]/div/div/main/div[1]/div[3]/div/div[2]/div/div[2]/div/div/div/div/div[2]/div/div[2]/div/div[2]/div/div/div[1]/input');
+                //set crypto count to 1, then get the ask button for determining price
+                const [buyCountInput] = await page.$x('/html/body/div[1]/div/div/main/div[1]/div[3]/div/div[2]/div/div[2]/div/div/div/div/div[2]/div/div[2]/div/div[2]/div/div/div[1]/input');
+                await buyCountInput.type('1');
+                await page.waitForSelector('.tiny.price-input-toggle.comp-toggle');
+                const [askButton] = await page.$x('//*[@id="td-web-root"]/main/div[1]/div[3]/div/div[2]/div/div[2]/div/div/div/div/div[2]/div/div[2]/div/div[1]/div[1]/div[2]/div/button[2]');
+
+                const buyPrice = await bittrexPriceWaitHelper(page, askButton, '/html/body/div[1]/div/div/main/div[1]/div[3]/div/div[2]/div/div[2]/div/div/div/div/div[2]/div/div[2]/div/div[3]/div[2]/div/div[1]/input');
+                // console.log(buyPrice);
+
+                //dismiss tooltips as it blocks the sell button, then click the selltab button
+                const [dismissTipButton] = await page.$x('/html/body/div[4]/div[2]/div/div/button[1]');
+                if (dismissTipButton) await dismissTipButton.click();
+                const [sellTabButton] = await page.$x('/html/body/div[1]/div/div/main/div[1]/div[3]/div/div[2]/div/div[2]/div/div/div/div/div[1]/div[1]/div/button[2]');
+                if (sellTabButton) {
+                    await sellTabButton.click();
+                }
+
+                // wait for the sell input to appear, then repeat process
+                await page.waitForXPath('/html/body/div[1]/div/div/main/div[1]/div[3]/div/div[2]/div/div[2]/div/div/div/div/div[2]/div/div[2]/div/div[2]/div[1]/div/div[1]/div');
+                const [sellCountInput] = await page.$x('/html/body/div[1]/div/div/main/div[1]/div[3]/div/div[2]/div/div[2]/div/div/div/div/div[2]/div/div[2]/div/div[2]/div[2]/div/div[1]/input');
+                await sellCountInput.type('1');
+
+                const sellPrice = await bittrexPriceWaitHelper(page, askButton, '/html/body/div[1]/div/div/main/div[1]/div[3]/div/div[2]/div/div[2]/div/div/div/div/div[2]/div/div[2]/div/div[3]/div/div/div[1]/input');
+                // console.log(sellPrice);
+                // await page.screenshot({ path: 'image.png' });
+                return [buyPrice, sellPrice];
+
+            });
+        });
+    });
 };
-//old code 
 
-
-// console.log($.html());
-// fs.writeFile('data.html', $.html(), () => {
-// });
+const bittrexPriceWaitHelper = async (page, askButton, pathToValue) => {
+    let ready = false;
+    let value;
+    while (!ready) {
+        await askButton.click();
+        value = await page.evaluate((path) => {
+            return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.value;
+        }, pathToValue);
+        ready = (value != '');
+        await delay(100);
+        console.log('waiting...');
+    }
+    return value;
+};
 
 exports.getBlockchainData = async (req, res, next) => {
     const urls = ['https://exchange.blockchain.com/trade/BTC-USD', 'https://exchange.blockchain.com/trade/ETH-USD'];
@@ -89,7 +133,17 @@ exports.getBlockchainData = async (req, res, next) => {
 };
 
 exports.getBittrexData = async (req, res, next) => {
-    let urls = ['https://bittrex.com/Market/Index?MarketName=USD-BTC'];
+    let urls = ['https://bittrex.com/Market/Index?MarketName=USD-BTC', 'https://bittrex.com/Market/Index?MarketName=USD-ETH'];
     let bittrexData = await getBittrexDataFromUrls(urls);
-    res.json(bittrexData);
+    let data = {
+        bitcoin: {
+            buy: bittrexData[0][0],
+            sell: bittrexData[0][1]
+        },
+        ethereum: {
+            buy: bittrexData[1][0],
+            sell: bittrexData[1][1]
+        }
+    };
+    res.json(data);
 };
