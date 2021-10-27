@@ -1,0 +1,43 @@
+h2 {
+    text-align: center;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.contents {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.site-info {
+    max-width: 40vh;
+    flex-grow: 3;
+    display: grid;
+    row-gap: 5px;
+    margin: 30px;
+    align-items: center;
+}
+
+.price-div {
+    display: grid;
+    grid-template-columns: 25% 50% 25%;
+    margin: 5px;
+}
+
+.price-label {
+    text-align: center;
+}
+
+.price-span {
+    text-align: center;
+}
+
+.MuiPaper-root {
+    background-color: rgb(38, 147, 241)
+}
