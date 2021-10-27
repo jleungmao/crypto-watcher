@@ -127,8 +127,15 @@ const parsePrice = (priceString) => {
         i--;
     }
     splitArr[0] = front.join('');
-    splitArr[1] = splitArr[1].substr(0, 2);
-    console.log(splitArr[1]);
+    if (splitArr[1]) {
+        if (splitArr[1].length == 1)
+            splitArr[1] = splitArr[1] + '0';
+        else
+            splitArr[1] = splitArr[1].substr(0, 2);
+    } else {
+        splitArr[1] = '00';
+    }
+    // console.log(splitArr[1]);
     return splitArr.join('.');
 };
 
