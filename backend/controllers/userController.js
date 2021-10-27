@@ -8,7 +8,7 @@ exports.getMain = (req, res, next) => {
 };
 
 const withBrowser = async (callback) => {
-    const browser = await puppeteer.launch({ headless: true, defaultViewport: { width: 1920, height: 1080 } });
+    const browser = await puppeteer.launch({});
     try {
         return await callback(browser);
     } finally {
@@ -54,7 +54,7 @@ const getBlockchainDataFromUrls = async (urls) => {
                 $ = cheerio.load(pageData);
                 const sellPrice = $('.sc-1ryi78w-0.meihw.sc-jSFkmK.lrNMr').text();
                 // console.log(sellPrice);
-                return [buyPrice, sellPrice];
+                return [parsePrice(buyPrice), parsePrice(sellPrice)];
             });
         });
     });
@@ -62,6 +62,7 @@ const getBlockchainDataFromUrls = async (urls) => {
 
 
 const getBittrexDataFromUrls = async (urls) => {
+
     return await withBrowser(async (browser) => {
         return bluebird.map(urls, async (url) => {
             return withPage(browser, async (page) => {
@@ -94,7 +95,7 @@ const getBittrexDataFromUrls = async (urls) => {
                 const sellPrice = await bittrexPriceWaitHelper(page, askButton, '/html/body/div[1]/div/div/main/div[1]/div[3]/div/div[2]/div/div[2]/div/div/div/div/div[2]/div/div[2]/div/div[3]/div/div/div[1]/input');
                 // console.log(sellPrice);
                 // await page.screenshot({ path: 'image.png' });
-                return [buyPrice, sellPrice];
+                return [parsePrice(buyPrice), parsePrice(sellPrice)];
 
             });
         });
@@ -111,9 +112,24 @@ const bittrexPriceWaitHelper = async (page, askButton, pathToValue) => {
         }, pathToValue);
         ready = (value != '');
         await delay(100);
-        console.log('waiting...');
+        // console.log('waiting...');
     }
     return value;
+};
+
+const parsePrice = (priceString) => {
+    let result = priceString.replace('$', '');
+    result = result.replace(',', '');
+    let splitArr = result.split('.');
+    let front = splitArr[0].split('');
+    for (let i = front.length - 3; i >= 0; i = i - 3) {
+        front.splice(i, 0, ',');
+        i--;
+    }
+    splitArr[0] = front.join('');
+    splitArr[1] = splitArr[1].substr(0, 2);
+    console.log(splitArr[1]);
+    return splitArr.join('.');
 };
 
 exports.getBlockchainData = async (req, res, next) => {
