@@ -17,4 +17,3 @@ Then to load the **frontend of the application**, open a new code editor to the 
 1. npm install
 2. npm run build
 3. npm run start
-
