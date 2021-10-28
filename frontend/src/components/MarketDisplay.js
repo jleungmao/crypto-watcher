@@ -20,7 +20,7 @@ function MarketDisplay(props) {
             <Divider />
             <div className='price-div'>
                 <label className='price-label'>Buy Price: </label>
-                <span className='price-span'>{props.buy}</span>
+                <span className='price-span'>${props.buy}</span>
                 <Button
                     className='button'
                     variant="contained"
@@ -31,7 +31,7 @@ function MarketDisplay(props) {
             </div>
             <div className='price-div'>
                 <label className='price-label'>Sell Price: </label>
-                <span className='price-span'>{props.sell}</span>
+                <span className='price-span'>${props.sell}</span>
                 <Button
                     className='button'
                     variant="contained"
