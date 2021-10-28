@@ -3,9 +3,9 @@ const puppeteer = require('puppeteer');
 const bluebird = require('bluebird');
 const { delay } = require('bluebird');
 
-exports.getMain = (req, res, next) => {
-    res.status(200).json({ message: "Successfully reached main page" });
-};
+// exports.getMain = (req, res, next) => {
+//     res.status(200).json({ message: "Successfully reached main page" });
+// };
 
 const withBrowser = async (callback) => {
     const browser = await puppeteer.launch({});
