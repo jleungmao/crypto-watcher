@@ -17,3 +17,5 @@ Then to load the **frontend of the application**, open a new code editor to the 
 1. npm install
 2. npm run build
 3. npm run start
+
+Navigate to http://localhost:3000/ to see the application run. If there are issues with loading prices, make sure the backend is up and running. 
