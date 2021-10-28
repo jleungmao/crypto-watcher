@@ -39,7 +39,7 @@ function App() {
 		console.log('repeating?');
 		const interval = setInterval(() => {
 			getPriceData();
-		}, 5000);
+		}, 3000);
 		return () => {
 			source.cancel();
 			clearInterval(interval);
