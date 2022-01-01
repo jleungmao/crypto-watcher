@@ -8,7 +8,7 @@ exports.getMain = (req, res, next) => {
 };
 
 const withBrowser = async (callback) => {
-    const browser = await puppeteer.launch({});
+    const browser = await puppeteer.launch({ headless: false });
     try {
         return await callback(browser);
     } finally {
